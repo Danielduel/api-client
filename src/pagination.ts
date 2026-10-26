@@ -60,7 +60,7 @@ export class Pagination {
     };
   }
   
-  getHeaderXTotalCount() {
+  getHeaderXTotalCount(): number | null {
     const total = this.response.headers.get("X-Total-Count");
     if (!total) return null;
     return parseInt(total, 10);
