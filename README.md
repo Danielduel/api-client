@@ -1,19 +1,17 @@
-# micro-api-client
+# Minimal API client
 
-[![Build Status](https://travis-ci.org/netlify/micro-api-client.svg?branch=master)](https://travis-ci.org/netlify/micro-api-client)
-
-Small library for talking to micro REST APIs (not related to Netlify's main API).
+Small library for talking to REST APIs.
 
 ## Installation
 
 ```
-yarn add micro-api-client
+pnpm add jsr:@dduel/api-client
 ```
 
 ## Usage
 
 ```js
-import API, { getPagination } from 'micro-api-client'
+import { API } from "jsr:@dduel/api-client"
 
 const api = new API("/some/api/endpoint");
 api
@@ -24,16 +22,13 @@ api
 
 ### API
 
-### `api = new API(apiURL, [opts])`
+### `const api = new API(apiURL, [defaultOptions])`
 
-Create a new `micro-api-client` instance. `apiURL` can be a full or relative URL. Optional `opts` include:
+Create a new `@dduel/api-client` instance. `apiURL` can be a full or relative URL. Optional `defaultOptions` include default `FetchInit`.
 
-```js
-{
-  defaultHeaders: {
-  } // header values to include in every request.
-}
-```
+FetchInit being the second parameter of standard `fetch` call.
+
+These opts are populated into requests, currently only headers are being populated.
 
 ### `api.request(path, [opts])`
 

@@ -1,7 +1,5 @@
-// import { getPagination } from "./pagination";
-// export { getPagination } from "./pagination";
-
 import type { HeadersInit } from "undici-types";
+import { Pagination } from "./pagination.ts";
 
 export class HTTPError extends Error {
   status: Response["status"]; // number
@@ -50,7 +48,6 @@ export class API {
     public apiURL = "",
     public defaultOptions: RequestInit = {}
   ) {
-    this.apiURL = apiURL;
     if (this.apiURL.match(/\/[^\/]?/)) {
       this.sameOrigin = true;
     }
@@ -73,9 +70,8 @@ export class API {
         return Promise.reject(new JSONHTTPError(response, json));
       }
 
-      // const pagination = getPagination(response);
-      // return pagination ? { pagination, items: json } : json;
-      return json
+      const pagination = Pagination.get(response);
+      return pagination ? { pagination, items: json } : json;
     });
   }
 

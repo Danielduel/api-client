@@ -1,40 +1,129 @@
+type HeaderLinkPagesT = {
+  last: number | undefined;
+  next: number | undefined;
+  prev: number | undefined;
+  first: number | undefined;
+};
+type RelPage = [string, number];
 
-export const getPagination = (response: Response) => {
-  let links: null | string | string[] = response.headers.get("Link");
+type PaginationT = Required<HeaderLinkPagesT> & {
+  last: number;
+  current: number;
+  total: number | null;
+};
 
-  const pagination = {};
-  //var link, url, rel, m, page;
-  if (links == null) {
-    return null;
-  }
-
-  links = links.split(",");
-  const total = response.headers.get("X-Total-Count");
-
-  for (let i = 0, len = links.length; i < len; i++) {
-    const link = links[i].replace(/(^\s*|\s*$)/, "");
-    const [url, rel] = link.split(";");
-    const m = url.match(/page=(\d+)/);
-    const page = m && parseInt(m[1], 10);
-    if (rel.match(/last/)) {
-      pagination.last = page;
-    } else if (rel.match(/next/)) {
-      pagination.next = page;
-    } else if (rel.match(/prev/)) {
-      pagination.prev = page;
-    } else if (rel.match(/first/)) {
-      pagination.first = page;
+export class Pagination {
+  static get(response: Response): PaginationT | null {
+    try {
+      const pagination = new Pagination(response);
+      return pagination.pagination();
+    } catch (__) {
+      return null;
     }
   }
 
-  pagination.last = Math.max(
-    pagination.last || 0,
-    (pagination.prev && pagination.prev + 1) || 0
-  );
-  pagination.current = pagination.next
-    ? pagination.next - 1
-    : pagination.last || 1;
-  pagination.total = total ? parseInt(total, 10) : null;
+  public last: number;
+  public current: number;
+  public total: number | null;
 
-  return pagination;
+  private headerXTotalCount: number | null;
+  private headerLinkArr: string[];
+  private headerLinkPages: HeaderLinkPagesT;
+
+  private constructor(public response: Response) {
+    this.headerLinkArr = this.getHeaderLinkArr();
+    this.headerXTotalCount = this.getHeaderXTotalCount();
+    this.headerLinkPages = this.getHeaderLinkPages();
+
+    this.last = Math.max(
+      this.headerLinkPages.last || 0,
+      (this.headerLinkPages.prev && this.headerLinkPages.prev + 1) || 0
+    );
+
+    this.current = this.headerLinkPages.next
+      ? this.headerLinkPages.next - 1
+      : this.headerLinkPages.last
+        || 1;
+
+    this.total = this.headerXTotalCount || null;
+  }
+
+  pagination(): PaginationT {
+    return {
+      total: this.total,
+      current: this.current,
+      last: this.last,
+      
+      next: this.headerLinkPages.next,
+      prev: this.headerLinkPages.prev,
+      first: this.headerLinkPages.first,
+    };
+  }
+  
+  getHeaderXTotalCount() {
+    const total = this.response.headers.get("X-Total-Count");
+    if (!total) return null;
+    return parseInt(total, 10);
+  }
+
+  getHeaderLinkArr(): string[] {
+    const link = this.response.headers.get("Link");
+    if (!link) throw new Error("There is no Link header");
+    return link.split(",");
+  }
+
+  *eachLinks(): Generator<RelPage> {
+    for (const link of this.headerLinkArr) {
+      const _link = link.replace(/(^\s*|\s*$)/, "");
+      const [url, rel] = _link.split(";");
+
+      if (!rel) continue;
+      if (!url) continue;
+
+      const urlMatch = url.match(/page=(\d+)/);
+
+      if (!urlMatch) continue;
+
+      const urlMatchDPart = urlMatch[1];
+
+      if (!urlMatchDPart) continue;
+
+      const page = parseInt(urlMatchDPart, 10);
+
+      yield [rel, page] as RelPage;
+    }
+  }
+
+  matchLast([rel, page]: RelPage) {
+    if (rel.match(/last/)) return page;
+  }
+
+  matchNext([rel, page]: RelPage) {
+    if (rel.match(/next/)) return page;
+  }
+
+  matchPrev([rel, page]: RelPage) {
+    if (rel.match(/prev/)) return page;
+  }
+
+  matchFirst([rel, page]: RelPage) {
+    if (rel.match(/first/)) return page;
+  }
+
+  getHeaderLinkPages(): HeaderLinkPagesT {
+    const returns: HeaderLinkPagesT = {
+      prev: void 0,
+      first: void 0,
+      next: void 0,
+      last: void 0,
+    };
+    for (const relPage of this.eachLinks()) {
+      returns.last ??= this.matchLast(relPage);      
+      returns.next ??= this.matchNext(relPage);
+      returns.prev ??= this.matchPrev(relPage);
+      returns.first ??= this.matchFirst(relPage);
+    }
+    return returns;
+  }
 }
+
