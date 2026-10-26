@@ -1,42 +1,66 @@
 {
-  "name": "micro-api-client",
-  "description": "Micro REST API client",
-  "version": "3.3.0",
-  "author": "Mathias Biilmann Christensen",
-  "bugs": "https://github.com/netlify/micro-api-client/issues",
-  "devDependencies": {
-    "babel-cli": "^6.8.0",
-    "babel-eslint": "^8.2.1",
-    "babel-plugin-syntax-object-rest-spread": "^6.8.0",
-    "babel-plugin-transform-builtin-extend": "^1.1.2",
-    "babel-plugin-transform-object-rest-spread": "^6.8.0",
-    "babel-preset-env": "^1.6.1",
-    "eslint": "^4.15.0",
-    "eslint-config-prettier": "^2.3.0",
-    "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-prettier": "^2.1.2",
-    "prettier": "^1.10.1"
-  },
-  "files": [
-    "lib"
-  ],
-  "homepage": "https://github.com/netlify/micro-api-client",
-  "keywords": [
-    "api",
-    "fetch",
-    "netlify"
-  ],
-  "license": "ISC",
-  "main": "lib/index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/netlify/micro-api-client.git"
-  },
+  "name": "@dduel/api-client",
+  "version": "0.0.1",
+  "description": "Minimal REST API client",
+  "main": "./src/mod.ts",
   "scripts": {
-    "compile": "babel src -d lib",
-    "format": "eslint . --fix && prettier --write 'src/**/*.js'",
-    "prepublish": "npm run compile",
-    "prettier-preview": "prettier --list-different 'src/**/*.js'",
-    "test": "eslint ."
+    "publish": "pnpm publish:test && pnpm publish:publish-dry && pnpm publish:publish",
+    "publish:test": "pnpm test",
+    "publish:publish-dry": "pnpm dlx jsr publish --dry-run",
+    "publish:publish": "pnpm dlx jsr publish",
+    "test": "node --experimental-transform-types --experimental-test-module-mocks --test",
+    "test:watch": "pnpm test --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.22.0",
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "dlx": "^0.2.1",
+    "typescript": "^7.0.2",
+    "undici-types": "^8.12.3"
+  },
+  "_old": {
+    "name": "",
+    "description": "Micro REST API client",
+    "version": "0.0.1",
+    "author": "",
+    "bugs": "https://github.com/dduel/api-client/issues",
+    "devDependencies": {
+      "babel-cli": "^6.8.0",
+      "babel-eslint": "^8.2.1",
+      "babel-plugin-syntax-object-rest-spread": "^6.8.0",
+      "babel-plugin-transform-builtin-extend": "^1.1.2",
+      "babel-plugin-transform-object-rest-spread": "^6.8.0",
+      "babel-preset-env": "^1.6.1",
+      "eslint": "^4.15.0",
+      "eslint-config-prettier": "^2.3.0",
+      "eslint-plugin-import": "^2.8.0",
+      "eslint-plugin-prettier": "^2.1.2",
+      "prettier": "^1.10.1"
+    },
+    "files": [
+      "lib"
+    ],
+    "homepage": "https://github.com/netlify/micro-api-client",
+    "keywords": [
+      "api",
+      "fetch",
+      "netlify"
+    ],
+    "license": "ISC",
+    "main": "lib/index.js",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/netlify/micro-api-client.git"
+    },
+    "scripts": {
+      "compile": "babel src -d lib",
+      "format": "eslint . --fix && prettier --write 'src/**/*.js'",
+      "prepublish": "npm run compile",
+      "prettier-preview": "prettier --list-different 'src/**/*.js'",
+      "test": "eslint ."
+    }
   }
 }

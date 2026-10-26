@@ -1,10 +1,13 @@
-export function getPagination(response) {
-  let links = response.headers.get("Link");
+
+export const getPagination = (response: Response) => {
+  let links: null | string | string[] = response.headers.get("Link");
+
   const pagination = {};
   //var link, url, rel, m, page;
   if (links == null) {
     return null;
   }
+
   links = links.split(",");
   const total = response.headers.get("X-Total-Count");
 
