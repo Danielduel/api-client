@@ -94,19 +94,19 @@ export class Pagination {
     }
   }
 
-  matchLast([rel, page]: RelPage) {
+  matchLast([rel, page]: RelPage): number | undefined {
     if (rel.match(/last/)) return page;
   }
 
-  matchNext([rel, page]: RelPage) {
+  matchNext([rel, page]: RelPage): number | undefined {
     if (rel.match(/next/)) return page;
   }
 
-  matchPrev([rel, page]: RelPage) {
+  matchPrev([rel, page]: RelPage): number | undefined {
     if (rel.match(/prev/)) return page;
   }
 
-  matchFirst([rel, page]: RelPage) {
+  matchFirst([rel, page]: RelPage): number | undefined {
     if (rel.match(/first/)) return page;
   }
 
