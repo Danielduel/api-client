@@ -8,9 +8,10 @@ describe("jsonplaceholder.typicode.com", () => {
     const _response = await api.request("/posts/1");
 
     assert.ok(_response);
-    assert.ok(typeof _response === "object")
+    assert.ok(typeof _response === "object");
+    assert.ok("json" in _response);
 
-    const response = _response as Record<string, unknown>; // lazy type cast
+    const response = _response.json as Record<string, unknown>; // lazy type cast
 
     assert.ok("userId" in response);
     assert.ok("id" in response);

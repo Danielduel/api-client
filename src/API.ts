@@ -1,6 +1,24 @@
 import type { HeadersInit } from "undici-types";
 import { Pagination } from "./pagination.ts";
 
+export type UnknownTransformer<T> = (x: unknown) => T;
+
+export class ResponseText {
+  constructor (
+    public response: Response,
+    public text: string,
+  ) {}
+}
+
+export class ResponseJson<T> {
+  constructor (
+    public response: Response,
+    public json: T,
+  ) {}
+}
+
+export type ResponseUnion = ResponseText | ResponseJson<unknown>;
+
 export class HTTPError extends Error {
   status: Response["status"]; // number
   stack?: string;
@@ -63,19 +81,8 @@ export class API {
       ...headers
     };
   }
-
-  parseJsonResponse(response: Response): Promise<unknown> {
-    return response.json().then(json => {
-      if (!response.ok) {
-        return Promise.reject(new JSONHTTPError(response, json));
-      }
-
-      const pagination = Pagination.get(response);
-      return pagination ? { pagination, items: json } : json;
-    });
-  }
-
-  request(path: string, options: RequestInit = {}): Promise<unknown> {
+ 
+  request(path: string, options: RequestInit = {}): Promise<ResponseUnion> {
     const headers = this.headers(options.headers || {});
 
     if (this.sameOrigin) {
@@ -85,8 +92,15 @@ export class API {
     return fetch(this.apiURL + path, { ...options, headers })
       .then(response => {
         const contentType = response.headers.get("Content-Type");
+
         if (contentType && contentType.match(/json/)) {
-          return this.parseJsonResponse(response);
+          return response.json()
+            .then(json => {
+              if (!response.ok) {
+                return Promise.reject(new JSONHTTPError(response, json));
+              }
+              return new ResponseJson(response, json);
+            })
         }
 
         if (!response.ok) {
@@ -94,9 +108,8 @@ export class API {
             return Promise.reject(new TextHTTPError(response, data));
           });
         }
-        return response.text().then(data => {
-          data;
-        });
+
+        return response.text().then(text => new ResponseText(response, text))
       });
   }
 }
