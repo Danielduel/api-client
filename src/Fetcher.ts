@@ -15,7 +15,7 @@ export class ResponseJson<T> {
     public json: T,
   ) {}
 
-  public __validated <NewT>(x: NewT) { return this as unknown as ResponseJson<NewT>; } // TODO: not really sure if I want to do this in this way 
+  public __validated <NewT>(x: NewT): ResponseJson<NewT> { return this as unknown as ResponseJson<NewT>; } // TODO: not really sure if I want to do this in this way 
 }
 
 export type ResponseUnion = ResponseText | ResponseJson<unknown>;

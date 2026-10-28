@@ -41,7 +41,7 @@ export class APIBuilderHTTPGet<_Response> {
     throw new Error("The response is not ResponseJson");
   }
 
-  public get() {
+  public get(): Promise<ResponseJson<_Response>> {
     return this
       ._fetcher
       .request(this._path, this._configuration.init)
@@ -60,7 +60,7 @@ export class APIBuilder {
     this.fetcher = fetcher || new Fetcher(URL, {});
   }
 
-  get<_Response>(path: string, configuration?: APIBuilderHTTPGetConfiguration<_Response>) {
+  get<_Response>(path: string, configuration?: APIBuilderHTTPGetConfiguration<_Response>): APIBuilderHTTPGet<_Response> {
     const _configuration: APIBuilderHTTPGetConfiguration<_Response> = { 
       ...configuration,
       init: {
