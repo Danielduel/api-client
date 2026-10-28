@@ -1,5 +1,4 @@
 import type { HeadersInit } from "undici-types";
-import { Pagination } from "./pagination.ts";
 
 export type UnknownTransformer<T> = (x: unknown) => T;
 
@@ -15,6 +14,8 @@ export class ResponseJson<T> {
     public response: Response,
     public json: T,
   ) {}
+
+  public __validated <NewT>(x: NewT) { return this as unknown as ResponseJson<NewT>; } // TODO: not really sure if I want to do this in this way 
 }
 
 export type ResponseUnion = ResponseText | ResponseJson<unknown>;
@@ -58,7 +59,7 @@ export class JSONHTTPError extends HTTPError {
   }
 }
 
-export class API {
+export class Fetcher {
   private sameOrigin = false;
   private defaultHeaders: HeadersInit = {};
 
